@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "BFHL API",
+    "_postman_id": "bfhl-api-collection-v1",
+    "description": "Campus hiring challenge – POST /bfhl endpoint tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Example A – Mixed input (letters, numbers, special chars)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"a\", \"1\", \"334\", \"4\", \"R\", \"$\"]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bfhl",
+          "host": ["{{base_url}}"],
+          "path": ["bfhl"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('is_success is true', () => pm.expect(json.is_success).to.be.true);",
+              "pm.test('user_id correct', () => pm.expect(json.user_id).to.eql('atharvya_sharma_01062006'));",
+              "pm.test('roll_number correct', () => pm.expect(json.roll_number).to.eql('0827AL231037'));",
+              "pm.test('odd_numbers correct', () => pm.expect(json.odd_numbers).to.deep.equal(['1']));",
+              "pm.test('even_numbers correct', () => pm.expect(json.even_numbers).to.deep.equal(['334','4']));",
+              "pm.test('alphabets correct', () => pm.expect(json.alphabets).to.deep.equal(['A','R']));",
+              "pm.test('special_characters correct', () => pm.expect(json.special_characters).to.deep.equal(['$']));",
+              "pm.test('sum correct', () => pm.expect(json.sum).to.eql('339'));",
+              "pm.test('concat_string correct', () => pm.expect(json.concat_string).to.eql('Ra'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Example B – Numbers only",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"2\", \"3\", \"11\", \"8\"]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bfhl",
+          "host": ["{{base_url}}"],
+          "path": ["bfhl"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('is_success is true', () => pm.expect(json.is_success).to.be.true);",
+              "pm.test('odd_numbers correct', () => pm.expect(json.odd_numbers).to.deep.equal(['3','11']));",
+              "pm.test('even_numbers correct', () => pm.expect(json.even_numbers).to.deep.equal(['2','8']));",
+              "pm.test('alphabets is empty', () => pm.expect(json.alphabets).to.be.empty);",
+              "pm.test('special_characters is empty', () => pm.expect(json.special_characters).to.be.empty);",
+              "pm.test('sum correct', () => pm.expect(json.sum).to.eql('24'));",
+              "pm.test('concat_string is empty', () => pm.expect(json.concat_string).to.eql(''));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Example C – Alphabets only (concat logic check)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"a\", \"y\", \"b\"]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bfhl",
+          "host": ["{{base_url}}"],
+          "path": ["bfhl"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('is_success is true', () => pm.expect(json.is_success).to.be.true);",
+              "pm.test('alphabets correct', () => pm.expect(json.alphabets).to.deep.equal(['A','Y','B']));",
+              "pm.test('odd_numbers is empty', () => pm.expect(json.odd_numbers).to.be.empty);",
+              "pm.test('even_numbers is empty', () => pm.expect(json.even_numbers).to.be.empty);",
+              "pm.test('sum is 0', () => pm.expect(json.sum).to.eql('0'));",
+              "pm.test('concat_string is ByA', () => pm.expect(json.concat_string).to.eql('ByA'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empty input",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": []\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bfhl",
+          "host": ["{{base_url}}"],
+          "path": ["bfhl"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('is_success is true', () => pm.expect(json.is_success).to.be.true);",
+              "pm.test('all arrays empty', () => {",
+              "  pm.expect(json.odd_numbers).to.be.empty;",
+              "  pm.expect(json.even_numbers).to.be.empty;",
+              "  pm.expect(json.alphabets).to.be.empty;",
+              "  pm.expect(json.special_characters).to.be.empty;",
+              "});",
+              "pm.test('sum is 0', () => pm.expect(json.sum).to.eql('0'));",
+              "pm.test('concat_string is empty', () => pm.expect(json.concat_string).to.eql(''));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
