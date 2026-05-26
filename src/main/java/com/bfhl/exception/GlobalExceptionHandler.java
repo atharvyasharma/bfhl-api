@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Catch-all handler for unexpected errors.
+     * Handles GET requests to paths with no mapped handler (404).
+     * Without this, Spring's NoResourceFoundException falls into the generic
+     * handler below and produces a misleading 500 "An unexpected error occurred" response.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResource(NoResourceFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("is_success", false);
+        body.put("error", "Endpoint not found: /" + ex.getResourcePath());
+        body.put("hint", "Use POST /bfhl to call the API, or GET /actuator/health for health status");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    /**
+     * Catch-all handler for unexpected application errors.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
